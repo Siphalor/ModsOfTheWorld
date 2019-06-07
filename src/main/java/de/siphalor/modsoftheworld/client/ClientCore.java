@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
 
+@SuppressWarnings("WeakerAccess")
 public class ClientCore {
 	public static final String MOD_ID = "modsoftheworld";
 
@@ -20,31 +21,31 @@ public class ClientCore {
 	public static final float FADE_TIME = 10;
 	public static final float WHOLE_TIME = SHOW_TIME + 2 * FADE_TIME;
 
-	private static ArrayList<LogoTexture> modLogos = null;
+	private static ArrayList<Logo> modLogos = null;
 
-	public static ArrayList<LogoTexture> getLogos() {
+	public static ArrayList<Logo> getLogos() {
 		if(modLogos != null) return modLogos;
 		modLogos = new ArrayList<>();
 		for(ModContainer mod : FabricLoader.getInstance().getAllMods()) {
 			String modId = mod.getMetadata().getId();
             Optional<String> iconPath = mod.getMetadata().getIconPath(8);
 			if(mod.getMetadata().containsCustomElement(LOGO_KEY.toString())) {
-				if(loadTexture(Identifier.ofNullable(JsonHelper.asString(mod.getMetadata().getCustomElement(LOGO_KEY.toString()), modId + "'s logo identifier")), true))
+				if(loadLogo(Identifier.ofNullable(JsonHelper.asString(mod.getMetadata().getCustomElement(LOGO_KEY.toString()), modId + "'s logo identifier")), mod.getMetadata().getName(), true))
 					continue;
 			}
-			iconPath.ifPresent(s -> loadTexture(new Identifier(s.replace("assets/", "").replaceFirst("/", ":")), true));
+			iconPath.ifPresent(s -> loadLogo(new Identifier(s.replace("assets/", "").replaceFirst("/", ":")), mod.getMetadata().getName(), true));
 		}
 		Collections.shuffle(modLogos);
-		loadTexture(new Identifier(MOD_ID, "java.png"), false);
+		loadLogo(new Identifier(MOD_ID, "java.png"), "Java", false);
 
 		return modLogos;
 	}
 
-	public static boolean loadTexture(Identifier logoId, boolean pushBack) {
+	public static boolean loadLogo(Identifier logoId, String modName, boolean pushBack) {
 		ResourceTexture.TextureData data = ResourceTexture.TextureData.load(MinecraftClient.getInstance().getResourceManager(), logoId);
 		try {
 			data.checkException();
-			modLogos.add(pushBack ? modLogos.size() : 0, new LogoTexture(logoId, data.getImage().getWidth(), data.getImage().getHeight()));
+			modLogos.add(pushBack ? modLogos.size() : 0, new Logo(logoId, data.getImage().getWidth(), data.getImage().getHeight(), modName));
 			return true;
 		} catch (IOException e) {
 			return false;

@@ -2,13 +2,12 @@ package de.siphalor.modsoftheworld.client.mixin;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import de.siphalor.modsoftheworld.client.ClientCore;
-import de.siphalor.modsoftheworld.client.LogoTexture;
+import de.siphalor.modsoftheworld.client.Logo;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+@SuppressWarnings("WeakerAccess")
 @Mixin(TitleScreen.class)
 public abstract class MainMenuScreenMixin extends Screen {
 
@@ -31,12 +31,15 @@ public abstract class MainMenuScreenMixin extends Screen {
 		modsOfTheWorld_logoTime += delta / 4;
 	}
 
+	@SuppressWarnings("ConstantConditions")
 	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/TitleScreen;blit(IIFFIIII)V", ordinal = 0))
 	public void editionBlitProxy(int x, int y, float texX, float texY, int width, int height, int texWidth, int texHeight) {
 		blit(x + 39, y, texX + 39, texY, width - 39, height, texWidth, texHeight);
 
-		if(modsOfTheWorld_logoTime > ClientCore.WHOLE_TIME)
+		if(modsOfTheWorld_logoTime > ClientCore.WHOLE_TIME) {
 			modsOfTheWorld_currentLogo = modsOfTheWorld_currentLogo >= ClientCore.getLogos().size() - 1 ? 0 : modsOfTheWorld_currentLogo + 1;
+			GLFW.glfwSetWindowTitle(minecraft.window.getHandle(), "Minecraft " + SharedConstants.getGameVersion().getName() + " - " + ClientCore.getLogos().get(modsOfTheWorld_currentLogo).modName + " Edition");
+		}
 		modsOfTheWorld_logoTime %= ClientCore.WHOLE_TIME;
 		float[] color = new float[4];
 		GL11.glGetFloatv(GL11.GL_CURRENT_COLOR, color);
@@ -50,7 +53,7 @@ public abstract class MainMenuScreenMixin extends Screen {
 
 		GlStateManager.pushMatrix();
 
-		LogoTexture logoTexture = ClientCore.getLogos().get(modsOfTheWorld_currentLogo);
+		Logo logoTexture = ClientCore.getLogos().get(modsOfTheWorld_currentLogo);
 		minecraft.getTextureManager().bindTexture(logoTexture.identifier);
 
 		float scaleFactor = (float) height / (float) logoTexture.height;
