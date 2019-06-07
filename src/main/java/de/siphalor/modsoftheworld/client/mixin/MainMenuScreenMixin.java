@@ -62,26 +62,4 @@ public abstract class MainMenuScreenMixin extends Screen {
         	GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		GlStateManager.popMatrix();
 	}
-
-	private void renderLogoTexture(float x, float y, int width, int height, LogoTexture texture) {
-		float textureOffset = 0;
-		float actualWidth = width;
-		if(x < 0) {
-			actualWidth += x;
-			textureOffset = -x;
-			x = 0;
-		}
-		if(x + width > 274) {
-			actualWidth -= width + x - 274;
-		}
-		this.minecraft.getTextureManager().bindTexture(texture.identifier);
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBufferBuilder();
-		bufferBuilder.begin(7, VertexFormats.POSITION_UV);
-		bufferBuilder.vertex(x, height, 0).texture(textureOffset / width, 1).next();
-		bufferBuilder.vertex(x + actualWidth, height, 0).texture((textureOffset + actualWidth) / width, 1).next();
-		bufferBuilder.vertex(x + actualWidth, 0, 0).texture((textureOffset + actualWidth) / width, 0).next();
-		bufferBuilder.vertex(x, 0, 0).texture(textureOffset / width, 0).next();
-		tessellator.draw();
-	}
 }
