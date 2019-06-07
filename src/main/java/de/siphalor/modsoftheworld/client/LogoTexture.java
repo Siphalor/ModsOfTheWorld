@@ -1,4 +1,4 @@
-package de.siphalor.modsoftheworld;
+package de.siphalor.modsoftheworld.client;
 
 import net.minecraft.util.Identifier;
 

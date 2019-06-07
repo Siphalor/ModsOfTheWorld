@@ -1,8 +1,8 @@
 package de.siphalor.modsoftheworld.client.mixin;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import de.siphalor.modsoftheworld.Core;
-import de.siphalor.modsoftheworld.LogoTexture;
+import de.siphalor.modsoftheworld.client.ClientCore;
+import de.siphalor.modsoftheworld.client.LogoTexture;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.render.BufferBuilder;
@@ -35,22 +35,22 @@ public abstract class MainMenuScreenMixin extends Screen {
 	public void editionBlitProxy(int x, int y, float texX, float texY, int width, int height, int texWidth, int texHeight) {
 		blit(x + 39, y, texX + 39, texY, width - 39, height, texWidth, texHeight);
 
-		if(modsOfTheWorld_logoTime > Core.WHOLE_TIME)
-			modsOfTheWorld_currentLogo = modsOfTheWorld_currentLogo >= Core.getLogos().size() - 1 ? 0 : modsOfTheWorld_currentLogo + 1;
-		modsOfTheWorld_logoTime %= Core.WHOLE_TIME;
+		if(modsOfTheWorld_logoTime > ClientCore.WHOLE_TIME)
+			modsOfTheWorld_currentLogo = modsOfTheWorld_currentLogo >= ClientCore.getLogos().size() - 1 ? 0 : modsOfTheWorld_currentLogo + 1;
+		modsOfTheWorld_logoTime %= ClientCore.WHOLE_TIME;
 		float[] color = new float[4];
 		GL11.glGetFloatv(GL11.GL_CURRENT_COLOR, color);
 		if(color[3] == 1.0F) {
 			float alpha = 1.0F;
-			if (modsOfTheWorld_logoTime < Core.FADE_TIME) alpha = modsOfTheWorld_logoTime / Core.FADE_TIME;
-			if (modsOfTheWorld_logoTime >= Core.WHOLE_TIME - Core.FADE_TIME)
-				alpha = 1.0F - (modsOfTheWorld_logoTime - Core.WHOLE_TIME + Core.FADE_TIME) / Core.FADE_TIME;
+			if (modsOfTheWorld_logoTime < ClientCore.FADE_TIME) alpha = modsOfTheWorld_logoTime / ClientCore.FADE_TIME;
+			if (modsOfTheWorld_logoTime >= ClientCore.WHOLE_TIME - ClientCore.FADE_TIME)
+				alpha = 1.0F - (modsOfTheWorld_logoTime - ClientCore.WHOLE_TIME + ClientCore.FADE_TIME) / ClientCore.FADE_TIME;
 			GlStateManager.color4f(1.0F, 1.0F, 1.0F, alpha);
 		}
 
 		GlStateManager.pushMatrix();
 
-		LogoTexture logoTexture = Core.getLogos().get(modsOfTheWorld_currentLogo);
+		LogoTexture logoTexture = ClientCore.getLogos().get(modsOfTheWorld_currentLogo);
 		minecraft.getTextureManager().bindTexture(logoTexture.identifier);
 
 		float scaleFactor = (float) height / (float) logoTexture.height;
