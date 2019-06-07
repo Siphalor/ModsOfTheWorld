@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -19,6 +20,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(TitleScreen.class)
 public abstract class MainMenuScreenMixin extends Screen {
 
+	@Shadow
+	private String splashText;
 	private int modsOfTheWorld_currentLogo = 0;
 	private float modsOfTheWorld_logoTime = 0;
 
@@ -39,6 +42,7 @@ public abstract class MainMenuScreenMixin extends Screen {
 		if(modsOfTheWorld_logoTime > ClientCore.WHOLE_TIME) {
 			modsOfTheWorld_currentLogo = modsOfTheWorld_currentLogo >= ClientCore.getLogos().size() - 1 ? 0 : modsOfTheWorld_currentLogo + 1;
 			GLFW.glfwSetWindowTitle(minecraft.window.getHandle(), "Minecraft " + SharedConstants.getGameVersion().getName() + " - " + ClientCore.getLogos().get(modsOfTheWorld_currentLogo).modName + " Edition");
+			splashText = ClientCore.getLogos().get(modsOfTheWorld_currentLogo).splashProvider.get();
 		}
 		modsOfTheWorld_logoTime %= ClientCore.WHOLE_TIME;
 		float[] color = new float[4];

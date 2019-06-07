@@ -2,13 +2,18 @@
 
 ![logo](src/main/resources/assets/modsoftheworld/icon_large.png)
 
-A mod to end all title screen conflicts
+A mod to end all title screen conflicts and Minecraft rebrandings.
+
+This mod contains custom changing logos in the edition part of the Minecraft title screen, an accordingly changing window title and splash texts.
+
+Logos will fallback to the mod icon. Splashes will default to the sentences of the mod description.
 
 ## Add support for MotW
-
+In the `fabric.mod.json` add:
 ```json
 "custom": {
-	"modid:logo": "modid:path/to/logo.png"
+	"modsoftheworld:logo": "modid:path/to/logo.png",
+	"modsoftheworld:splashes": "modid:path/to/splashes.txt"
 }
 ```
 
