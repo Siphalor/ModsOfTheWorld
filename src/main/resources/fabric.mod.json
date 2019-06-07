@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "modsoftheworld",
+	"version": "${version}",
+
+	"name": "Mods of the World",
+	"description": "Gives every mod it's famous seconds on the title screen.",
+
+	"authors": [
+		"Siphalor"
+	],
+	"contact": {
+		"email": "xyx0125@gmail.com",
+		"issues": "https://github.com/Siphalor/modsoftheworld/issues",
+		"sources": "https://github.com/Siphalor/modsoftheworld"
+	},
+
+	"license": "CC0-1.0",
+	"icon": "assets/modsoftheworld/icon.png",
+
+	"environment": "client",
+	"mixins": [
+		{
+			"config": "modsoftheworld.client.json",
+			"environment": "client"
+		}
+	],
+
+	"requires": {
+		"fabricloader": ">=0.4.0"
+	},
+
+	"custom": {
+		"modmenu:clientsideOnly": true,
+		"modsoftheworld:logo": "modsoftheworld:logo.png"
+	}
+}
