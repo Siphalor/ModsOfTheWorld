@@ -7,7 +7,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.ResourceTexture;
 import net.minecraft.resource.Resource;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,8 +40,8 @@ public class ClientCore {
             Random random = new Random();
 
 
-			if(modMetadata.containsCustomElement(LOGO_KEY.toString())) {
-				if(loadLogo(Identifier.ofNullable(JsonHelper.asString(modMetadata.getCustomElement(LOGO_KEY.toString()), modId + "'s logo identifier")), modMetadata.getName(), splashProvider, true))
+			if(modMetadata.containsCustomValue(LOGO_KEY.toString())) {
+				if(loadLogo(Identifier.tryParse(modMetadata.getCustomValue(LOGO_KEY.toString()).getAsString()), modMetadata.getName(), splashProvider, true))
 					continue;
 			}
 			iconPath.ifPresent(s -> loadLogo(new Identifier(s.replace("assets/", "").replaceFirst("/", ":")), modMetadata.getName(), splashProvider, true));
@@ -65,9 +64,9 @@ public class ClientCore {
 	}
 
 	public static SplashProvider loadSplashes(ModMetadata modMetadata) {
-		if(modMetadata.containsCustomElement(SPLASHES_KEY.toString())) {
+		if(modMetadata.containsCustomValue(SPLASHES_KEY.toString())) {
 			try {
-				Resource resource = MinecraftClient.getInstance().getResourceManager().getResource(Identifier.ofNullable(JsonHelper.asString(modMetadata.getCustomElement(SPLASHES_KEY.toString()), "splash file identifier")));
+				Resource resource = MinecraftClient.getInstance().getResourceManager().getResource(Identifier.tryParse(modMetadata.getCustomValue(SPLASHES_KEY.toString()).getAsString()));
 				if(resource != null) {
 					BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
 					String[] splashes = reader.lines().map(String::trim).toArray(String[]::new);
