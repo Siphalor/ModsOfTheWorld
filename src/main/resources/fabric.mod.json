@@ -20,13 +20,10 @@
 
 	"environment": "client",
 	"mixins": [
-		{
-			"config": "modsoftheworld.client.json",
-			"environment": "client"
-		}
+		"modsoftheworld.mixins.json"
 	],
 
-	"requires": {
+	"depends": {
 		"fabricloader": ">=0.4.0"
 	},
 

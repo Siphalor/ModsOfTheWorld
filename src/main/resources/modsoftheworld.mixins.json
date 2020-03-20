@@ -2,7 +2,7 @@
 	"required": true,
 	"package": "de.siphalor.modsoftheworld.client.mixin",
 	"compatibilityLevel": "JAVA_8",
-	"mixins": [
+	"client": [
 		"MainMenuScreenMixin"
 	],
 	"injectors": {
