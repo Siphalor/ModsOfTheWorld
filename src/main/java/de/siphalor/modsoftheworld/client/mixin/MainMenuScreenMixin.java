@@ -6,6 +6,7 @@ import de.siphalor.modsoftheworld.client.Logo;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -30,14 +31,14 @@ public abstract class MainMenuScreenMixin extends Screen {
 	}
 
 	@Inject(method = "render", at = @At("HEAD"))
-	public void onRender(int x, int y, float delta, CallbackInfo callbackInfo) {
+	public void onRender(MatrixStack matrices, int x, int y, float delta, CallbackInfo callbackInfo) {
 		modsOfTheWorld_logoTime += delta / 4;
 	}
 
 	@SuppressWarnings("ConstantConditions")
-	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/TitleScreen;drawTexture(IIFFIIII)V", ordinal = 0))
-	public void editionBlitProxy(int x, int y, float texX, float texY, int width, int height, int texWidth, int texHeight) {
-		drawTexture(x + 39, y, texX + 39, texY, width - 39, height, texWidth, texHeight);
+	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/TitleScreen;drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIFFIIII)V", ordinal = 0))
+	public void editionBlitProxy(MatrixStack matrices, int x, int y, float texX, float texY, int width, int height, int texWidth, int texHeight) {
+		drawTexture(matrices, x + 39, y, texX + 39, texY, width - 39, height, texWidth, texHeight);
 
 		if(modsOfTheWorld_logoTime > ClientCore.WHOLE_TIME) {
 			modsOfTheWorld_currentLogo = modsOfTheWorld_currentLogo >= ClientCore.getLogos().size() - 1 ? 0 : modsOfTheWorld_currentLogo + 1;
@@ -55,18 +56,18 @@ public abstract class MainMenuScreenMixin extends Screen {
 			RenderSystem.color4f(1F, 1F, 1F, alpha);
 		}
 
-		RenderSystem.pushMatrix();
+		matrices.push();
 
 		Logo logoTexture = ClientCore.getLogos().get(modsOfTheWorld_currentLogo);
 		client.getTextureManager().bindTexture(logoTexture.identifier);
 
 		float scaleFactor = (float) height / (float) logoTexture.height;
-		RenderSystem.translatef(x + 39F - logoTexture.width * scaleFactor, y, 0F);
-		RenderSystem.scalef(scaleFactor, scaleFactor, 1F);
-		drawTexture(0, 0, 0.0F, 0.0F, logoTexture.width, logoTexture.height, logoTexture.width, logoTexture.height);
+		matrices.translate(x + 39F - logoTexture.width * scaleFactor, y, 0F);
+		matrices.scale(scaleFactor, scaleFactor, 1F);
+		drawTexture(matrices, 0, 0, 0.0F, 0.0F, logoTexture.width, logoTexture.height, logoTexture.width, logoTexture.height);
 
         if(color[3] == 1.0F)
         	RenderSystem.color4f(1F, 1F, 1F, 1F);
-		RenderSystem.popMatrix();
+		matrices.pop();
 	}
 }
