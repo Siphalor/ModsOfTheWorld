@@ -1,8 +1,8 @@
 package de.siphalor.modsoftheworld.client.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import de.siphalor.modsoftheworld.client.ClientCore;
 import de.siphalor.modsoftheworld.client.Logo;
+import de.siphalor.modsoftheworld.client.MOTWClient;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
@@ -40,25 +40,25 @@ public abstract class MainMenuScreenMixin extends Screen {
 	public void editionBlitProxy(MatrixStack matrices, int x, int y, float texX, float texY, int width, int height, int texWidth, int texHeight) {
 		drawTexture(matrices, x + 39, y, texX + 39, texY, width - 39, height, texWidth, texHeight);
 
-		if(modsOfTheWorld_logoTime > ClientCore.WHOLE_TIME) {
-			modsOfTheWorld_currentLogo = modsOfTheWorld_currentLogo >= ClientCore.getLogos().size() - 1 ? 0 : modsOfTheWorld_currentLogo + 1;
-			GLFW.glfwSetWindowTitle(client.getWindow().getHandle(), "Minecraft " + SharedConstants.getGameVersion().getName() + " - " + ClientCore.getLogos().get(modsOfTheWorld_currentLogo).modName + " Edition");
-			splashText = ClientCore.getLogos().get(modsOfTheWorld_currentLogo).splashProvider.get();
+		if(modsOfTheWorld_logoTime > MOTWClient.WHOLE_TIME) {
+			modsOfTheWorld_currentLogo = modsOfTheWorld_currentLogo >= MOTWClient.getLogos().size() - 1 ? 0 : modsOfTheWorld_currentLogo + 1;
+			GLFW.glfwSetWindowTitle(client.getWindow().getHandle(), "Minecraft " + SharedConstants.getGameVersion().getName() + " - " + MOTWClient.getLogos().get(modsOfTheWorld_currentLogo).modName + " Edition");
+			splashText = MOTWClient.getLogos().get(modsOfTheWorld_currentLogo).splashProvider.get();
 		}
-		modsOfTheWorld_logoTime %= ClientCore.WHOLE_TIME;
+		modsOfTheWorld_logoTime %= MOTWClient.WHOLE_TIME;
 		float[] color = new float[4];
 		GL11.glGetFloatv(GL11.GL_CURRENT_COLOR, color);
 		if(color[3] == 1.0F) {
 			float alpha = 1.0F;
-			if (modsOfTheWorld_logoTime < ClientCore.FADE_TIME) alpha = modsOfTheWorld_logoTime / ClientCore.FADE_TIME;
-			if (modsOfTheWorld_logoTime >= ClientCore.WHOLE_TIME - ClientCore.FADE_TIME)
-				alpha = 1.0F - (modsOfTheWorld_logoTime - ClientCore.WHOLE_TIME + ClientCore.FADE_TIME) / ClientCore.FADE_TIME;
+			if (modsOfTheWorld_logoTime < MOTWClient.FADE_TIME) alpha = modsOfTheWorld_logoTime / MOTWClient.FADE_TIME;
+			if (modsOfTheWorld_logoTime >= MOTWClient.WHOLE_TIME - MOTWClient.FADE_TIME)
+				alpha = 1.0F - (modsOfTheWorld_logoTime - MOTWClient.WHOLE_TIME + MOTWClient.FADE_TIME) / MOTWClient.FADE_TIME;
 			RenderSystem.color4f(1F, 1F, 1F, alpha);
 		}
 
 		matrices.push();
 
-		Logo logoTexture = ClientCore.getLogos().get(modsOfTheWorld_currentLogo);
+		Logo logoTexture = MOTWClient.getLogos().get(modsOfTheWorld_currentLogo);
 		client.getTextureManager().bindTexture(logoTexture.identifier);
 
 		float scaleFactor = (float) height / (float) logoTexture.height;
