@@ -13,13 +13,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("WeakerAccess")
-public class ClientCore {
+public class MOTWClient {
 	public static final String MOD_ID = "modsoftheworld";
 
 	public static final Identifier LOGO_KEY = new Identifier(MOD_ID, "logo");
 	public static final Identifier SPLASHES_KEY = new Identifier(MOD_ID, "splashes");
+	public static final Pattern FABRIC_PATTERN = Pattern.compile("fabric-api-base|fabric-.*-v\\d");
 	public static final float SHOW_TIME = 15;
 	public static final float FADE_TIME = 10;
 	public static final float WHOLE_TIME = SHOW_TIME + 2 * FADE_TIME;
@@ -28,17 +30,25 @@ public class ClientCore {
 	private static ArrayList<Logo> modLogos = null;
 
 	public static ArrayList<Logo> getLogos() {
-		if(modLogos != null) return modLogos;
+		if (modLogos != null) return modLogos;
 		modLogos = new ArrayList<>();
-		for(ModContainer mod : FabricLoader.getInstance().getAllMods()) {
+		for (ModContainer mod : FabricLoader.getInstance().getAllMods()) {
 			ModMetadata modMetadata = mod.getMetadata();
 
-			String modId = modMetadata.getId();
-            Optional<String> iconPath = modMetadata.getIconPath(8);
+			Optional<String> iconPath = modMetadata.getIconPath(8);
 
-            SplashProvider splashProvider = loadSplashes(modMetadata);
-            Random random = new Random();
+			if (
+				FABRIC_PATTERN.matcher(modMetadata.getId()).find()
+				|| modMetadata.containsCustomValue("modmenu:api")
+				&& (
+					!modMetadata.containsCustomValue(LOGO_KEY.toString())
+					&& !modMetadata.containsCustomValue(SPLASHES_KEY.toString())
+				)
+			) {
+				continue;
+			}
 
+			SplashProvider splashProvider = loadSplashes(modMetadata);
 
 			if(modMetadata.containsCustomValue(LOGO_KEY.toString())) {
 				if(loadLogo(Identifier.tryParse(modMetadata.getCustomValue(LOGO_KEY.toString()).getAsString()), modMetadata.getName(), splashProvider, true))
