@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.2.6-SNAPSHOT'
+	id 'fabric-loom' version '0.4-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -19,8 +19,8 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_version}"
 	modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modCompile "net.fabricmc.fabric-api:fabric-resource-loader-v0:0.1.14+2fd224cae8"
-	include "net.fabricmc.fabric-api:fabric-resource-loader-v0:0.1.14+2fd224cae8"
+	modCompile "net.fabricmc.fabric-api:fabric-resource-loader-v0:0.2.6+f41e209802"
+	include "net.fabricmc.fabric-api:fabric-resource-loader-v0:0.2.6+f41e209802"
 }
 
 processResources {
