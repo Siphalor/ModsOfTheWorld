@@ -7,6 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.ResourceTexture;
 import net.minecraft.resource.Resource;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -54,7 +55,15 @@ public class MOTWClient {
 				if(loadLogo(Identifier.tryParse(modMetadata.getCustomValue(LOGO_KEY.toString()).getAsString()), modMetadata.getName(), splashProvider, true))
 					continue;
 			}
-			iconPath.ifPresent(s -> loadLogo(new Identifier(s.replace("assets/", "").replaceFirst("/", ":")), modMetadata.getName(), splashProvider, true));
+
+			try {
+				iconPath.ifPresent(s -> {
+					s = s.toLowerCase(Locale.ENGLISH);
+					loadLogo(new Identifier(s.replace("assets/", "").replaceFirst("/", ":")), modMetadata.getName(), splashProvider, true);
+				});
+			} catch (InvalidIdentifierException e) {
+				System.err.println("[MOTW] Found invalid icon identifier \"" + iconPath.get() + "\" for mod " + modMetadata.getName());
+			}
 		}
 		Collections.shuffle(modLogos);
 		loadLogo(new Identifier(MOD_ID, "java.png"), "Java", SplashProvider.DEFAULT, false);
