@@ -53,21 +53,22 @@ public abstract class MainMenuScreenMixin extends Screen {
 			if (modsOfTheWorld_logoTime < MOTWClient.FADE_TIME) alpha = modsOfTheWorld_logoTime / MOTWClient.FADE_TIME;
 			if (modsOfTheWorld_logoTime >= MOTWClient.WHOLE_TIME - MOTWClient.FADE_TIME)
 				alpha = 1.0F - (modsOfTheWorld_logoTime - MOTWClient.WHOLE_TIME + MOTWClient.FADE_TIME) / MOTWClient.FADE_TIME;
-			RenderSystem.color4f(1F, 1F, 1F, alpha);
+			RenderSystem.setShaderColor(1F, 1F, 1F, alpha);
 		}
 
 		matrices.push();
 
 		Logo logoTexture = MOTWClient.getLogos().get(modsOfTheWorld_currentLogo);
-		client.getTextureManager().bindTexture(logoTexture.identifier);
+		RenderSystem.setShaderTexture(0, logoTexture.identifier);
 
 		float scaleFactor = (float) height / (float) logoTexture.height;
 		matrices.translate(x + 39F - logoTexture.width * scaleFactor, y, 0F);
 		matrices.scale(scaleFactor, scaleFactor, 1F);
 		drawTexture(matrices, 0, 0, 0.0F, 0.0F, logoTexture.width, logoTexture.height, logoTexture.width, logoTexture.height);
 
-        if(color[3] == 1.0F)
-        	RenderSystem.color4f(1F, 1F, 1F, 1F);
+		if(color[3] == 1.0F) {
+			RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+		}
 		matrices.pop();
 	}
 }
