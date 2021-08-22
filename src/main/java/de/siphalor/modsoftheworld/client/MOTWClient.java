@@ -4,10 +4,13 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.ResourceTexture;
 import net.minecraft.resource.Resource;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
+import org.lwjgl.opengl.GL32;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -72,12 +75,22 @@ public class MOTWClient {
 	}
 
 	public static boolean loadLogo(Identifier logoId, String modName, SplashProvider splashProvider, boolean pushBack) {
-		ResourceTexture.TextureData data = ResourceTexture.TextureData.load(MinecraftClient.getInstance().getResourceManager(), logoId);
+		ResourceTexture resourceTexture = new ResourceTexture(logoId);
 		try {
-			data.checkException();
-			modLogos.add(pushBack ? modLogos.size() : 0, new Logo(logoId, data.getImage().getWidth(), data.getImage().getHeight(), modName, splashProvider));
+			ResourceManager resourceManager = MinecraftClient.getInstance().getResourceManager();
+			Resource resource = resourceManager.getResource(logoId);
+			NativeImage nativeImage = NativeImage.read(resource.getInputStream());
+			resourceTexture.load(resourceManager);
+			Logo logo = new Logo(
+					resourceTexture, logoId, nativeImage.getWidth(), nativeImage.getHeight(), modName, splashProvider
+			);
+			modLogos.add(
+					pushBack ? modLogos.size() : 0,
+					logo
+			);
 			return true;
 		} catch (IOException e) {
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -120,5 +133,13 @@ public class MOTWClient {
 		} else {
 			return SplashProvider.DEFAULT;
 		}
+	}
+
+	public static int getCurrentTexWidth() {
+		return GL32.glGetTexParameteri(GL32.GL_TEXTURE_2D, GL32.GL_TEXTURE_WIDTH);
+	}
+
+	public static int getCurrentTexHeight() {
+		return GL32.glGetTexParameteri(GL32.GL_TEXTURE_2D, GL32.GL_TEXTURE_HEIGHT);
 	}
 }

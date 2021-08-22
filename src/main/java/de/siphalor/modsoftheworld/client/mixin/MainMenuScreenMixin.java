@@ -9,7 +9,6 @@ import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,9 +25,10 @@ public abstract class MainMenuScreenMixin extends Screen {
 	private int modsOfTheWorld_currentLogo = 0;
 	private float modsOfTheWorld_logoTime = 0;
 
-	protected MainMenuScreenMixin(Text text_1) {
-		super(text_1);
+	protected MainMenuScreenMixin(Text title) {
+		super(title);
 	}
+
 
 	@Inject(method = "render", at = @At("HEAD"))
 	public void onRender(MatrixStack matrices, int x, int y, float delta, CallbackInfo callbackInfo) {
@@ -42,12 +42,14 @@ public abstract class MainMenuScreenMixin extends Screen {
 
 		if(modsOfTheWorld_logoTime > MOTWClient.WHOLE_TIME) {
 			modsOfTheWorld_currentLogo = modsOfTheWorld_currentLogo >= MOTWClient.getLogos().size() - 1 ? 0 : modsOfTheWorld_currentLogo + 1;
-			GLFW.glfwSetWindowTitle(client.getWindow().getHandle(), "Minecraft " + SharedConstants.getGameVersion().getName() + " - " + MOTWClient.getLogos().get(modsOfTheWorld_currentLogo).modName + " Edition");
-			splashText = MOTWClient.getLogos().get(modsOfTheWorld_currentLogo).splashProvider.get();
+			GLFW.glfwSetWindowTitle(
+					client.getWindow().getHandle(), "Minecraft " + SharedConstants.getGameVersion().getName()
+							+ " - " + MOTWClient.getLogos().get(modsOfTheWorld_currentLogo).getModName() + " Edition"
+			);
+			splashText = MOTWClient.getLogos().get(modsOfTheWorld_currentLogo).getSplashProvider().get();
 		}
 		modsOfTheWorld_logoTime %= MOTWClient.WHOLE_TIME;
-		float[] color = new float[4];
-		GL11.glGetFloatv(GL11.GL_CURRENT_COLOR, color);
+		float[] color = RenderSystem.getShaderColor();
 		if(color[3] == 1.0F) {
 			float alpha = 1.0F;
 			if (modsOfTheWorld_logoTime < MOTWClient.FADE_TIME) alpha = modsOfTheWorld_logoTime / MOTWClient.FADE_TIME;
@@ -58,13 +60,15 @@ public abstract class MainMenuScreenMixin extends Screen {
 
 		matrices.push();
 
-		Logo logoTexture = MOTWClient.getLogos().get(modsOfTheWorld_currentLogo);
-		RenderSystem.setShaderTexture(0, logoTexture.identifier);
+		Logo logo = MOTWClient.getLogos().get(modsOfTheWorld_currentLogo);
+		RenderSystem.setShaderTexture(0, logo.getIdentifier());
 
-		float scaleFactor = (float) height / (float) logoTexture.height;
-		matrices.translate(x + 39F - logoTexture.width * scaleFactor, y, 0F);
+		float scaleFactor = (float) height / (float) logo.getHeight();
+		matrices.translate(x + 39F - logo.getWidth() * scaleFactor, y, 0F);
 		matrices.scale(scaleFactor, scaleFactor, 1F);
-		drawTexture(matrices, 0, 0, 0.0F, 0.0F, logoTexture.width, logoTexture.height, logoTexture.width, logoTexture.height);
+		drawTexture(
+				matrices, 0, 0, 0.0F, 0.0F, logo.getWidth(), logo.getHeight(), logo.getWidth(), logo.getHeight()
+		);
 
 		if(color[3] == 1.0F) {
 			RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
