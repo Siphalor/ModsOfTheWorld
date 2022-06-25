@@ -1,5 +1,19 @@
 package de.siphalor.modsoftheworld.client;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Random;
+import java.util.regex.Pattern;
+
+import org.lwjgl.opengl.GL32;
+
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -10,14 +24,6 @@ import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
-import org.lwjgl.opengl.GL32;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.regex.Pattern;
 
 @SuppressWarnings("WeakerAccess")
 public class MOTWClient {
@@ -78,7 +84,7 @@ public class MOTWClient {
 		ResourceTexture resourceTexture = new ResourceTexture(logoId);
 		try {
 			ResourceManager resourceManager = MinecraftClient.getInstance().getResourceManager();
-			Resource resource = resourceManager.getResource(logoId);
+			Resource resource = resourceManager.getResourceOrThrow(logoId);
 			NativeImage nativeImage = NativeImage.read(resource.getInputStream());
 			resourceTexture.load(resourceManager);
 			Logo logo = new Logo(
@@ -98,21 +104,19 @@ public class MOTWClient {
 	public static SplashProvider loadSplashes(ModMetadata modMetadata) {
 		if(modMetadata.containsCustomValue(SPLASHES_KEY.toString())) {
 			try {
-				Resource resource = MinecraftClient.getInstance().getResourceManager().getResource(Identifier.tryParse(modMetadata.getCustomValue(SPLASHES_KEY.toString()).getAsString()));
-				if(resource != null) {
-					BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
-					String[] splashes = reader.lines().map(String::trim).toArray(String[]::new);
+				Resource resource = MinecraftClient.getInstance().getResourceManager().getResourceOrThrow(Identifier.tryParse(modMetadata.getCustomValue(SPLASHES_KEY.toString()).getAsString()));
+				BufferedReader reader = new BufferedReader(
+						new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
+				String[] splashes = reader.lines().map(String::trim).toArray(String[]::new);
 
-					reader.close();
-					resource.close();
+				reader.close();
 
-					return new SplashProvider() {
-						@Override
-						public String get() {
-							return splashes[RANDOM.nextInt(splashes.length)];
-						}
-					};
-				}
+				return new SplashProvider() {
+					@Override
+					public String get() {
+						return splashes[RANDOM.nextInt(splashes.length)];
+					}
+				};
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
